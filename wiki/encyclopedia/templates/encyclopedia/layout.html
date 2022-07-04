@@ -15,14 +15,15 @@
                 <form action="{% url 'search' %}" method="get">
                     <input class="search" type="text" name="q" placeholder="Search Encyclopedia">
                 </form>
+                <hr>
                 <div>
-                    <a href="{% url 'index' %}">Home</a>
+                    <a id="margin" class="btn btn-primary" href="{% url 'index' %}" role="button">Home</a>
                 </div>
                 <div>
-                    <a href="{% url 'createPage' %}">Create New Page</a>
+                    <a id="margin" class="btn btn-primary" href="{% url 'createPage' %}" role="button">Create New Page</a>
                 </div>
                 <div>
-                    <a href="">Random Page</a>
+                    <a id="margin" class="btn btn-primary" href="{% url 'random' %}}" role="button">Random Page</a>
                 </div>
                 {% block nav %}
                 {% endblock %}

@@ -1,7 +1,7 @@
+import secrets
 from django.urls import reverse
-import re
 from django import forms
-from django.http import HttpResponseBadRequest, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 from markdown import Markdown
 
@@ -12,7 +12,7 @@ from . import util
     # task = forms.CharField(label="New Task")
 
 class NewEntryForm(forms.Form):
-    title = forms.charField(label="new title", widget=forms.TextInput(attrs={'class': 'form-control col-md-col-lg-8'}))
+    title = forms.CharField(label="new title", widget=forms.TextInput(attrs={'class': 'form-control col-md-col-lg-8 ', 'id': 'input'}))
     content = forms.CharField(label="new content", widget=forms.Textarea(attrs={'class': 'form-control col-md-8 col-lg-8'}))
     edit = forms.BooleanField(initial=False, widget=forms.HiddenInput, required=False)
 
@@ -57,7 +57,7 @@ def entry(request, entry):
 
     else:
         return render(request, "encyclopedia/entry.html", {
-            "entry" : markdown.covert(entryPage),
+            "entry" : markdown.convert(entryPage),
             "entryTitle": entry
 
     })
@@ -66,7 +66,6 @@ def search(request):
     value = request.GET.get('q','')
     if(util.get_entry(value) is not None):
         return HttpResponseRedirect(reverse("entry", Kwargs={'entry': value }))
-    
     else:
         Entries = []
         for entry in util.list_entries():
@@ -78,6 +77,26 @@ def search(request):
             "search": True,
             "value": value
         })
- 
-def creatPage(request):
-    return render(request, "encyclopedia/creatPage.html")
+
+def edit(request, entry):
+    entryPage = util.get_entry(entry)
+    if entryPage is None:
+        return render(request, "encyclopedia/notMatchEntry.html", {
+            "entryTitle": entry 
+        })
+    else:
+        form = NewEntryForm()
+        form.fields["title"].initial = entry
+        form.fields["title"].widget = forms.HiddenInput()
+        form.fields["content"].initial = entryPage
+        form.fields["edit"].initial = True
+        return render(request, "encyclopedia/createPage.html", {
+            "form": form,
+            "edit": form.fields["edit"].initial,
+            "entryTitle": form.fields["title"].initial
+        })
+
+def random(request):
+    entries = util.list_entries()
+    randomEntry = secrets.choice(entries)
+    return HttpResponseRedirect(reverse("entry", kwargs={"entry": randomEntry}))
