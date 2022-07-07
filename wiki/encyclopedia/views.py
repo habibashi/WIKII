@@ -8,13 +8,11 @@ from markdown import Markdown
 from . import util
 
 
-# class NewTasksForm(forms.Form):
-    # task = forms.CharField(label="New Task")
 
 class NewEntryForm(forms.Form):
-    title = forms.CharField(label="new title", widget=forms.TextInput(attrs={'class': 'form-control col-md-col-lg-8 ', 'id': 'input'}))
-    content = forms.CharField(label="new content", widget=forms.Textarea(attrs={'class': 'form-control col-md-8 col-lg-8'}))
-    edit = forms.BooleanField(initial=False, widget=forms.HiddenInput, required=False)
+    title = forms.CharField(label="new title", widget=forms.TextInput(attrs={'class': 'form-control col-7 md-col-lg-7'}))
+    content = forms.CharField(label="new content", widget=forms.Textarea(attrs={'class': 'form-control col-7 md-7 col-lg-7'}))
+    edit = forms.BooleanField(initial=False, widget=forms.HiddenInput(), required=False)
 
 def createPage(request):
     if request.method == "POST":
@@ -49,23 +47,23 @@ def index(request):
     })
 
 def entry(request, entry):
-    markdown = Markdown()
+    markdownn = Markdown()
     entryPage = util.get_entry(entry)
 
     if entryPage is None:
-        return render(request, "encylopedia/notMatchEntry.html")
-
+        return render(request, "encylopedia/notMatchEntry.html", {
+            "entryTitle" : entry
+        })
     else:
         return render(request, "encyclopedia/entry.html", {
-            "entry" : markdown.convert(entryPage),
-            "entryTitle": entry
-
+            "entry" : markdownn.convert(entryPage),
+            "entryTitle": entry 
     })
 
 def search(request):
-    value = request.GET.get('q','')
+    value = request.GET.get('q')
     if(util.get_entry(value) is not None):
-        return HttpResponseRedirect(reverse("entry", Kwargs={'entry': value }))
+        return HttpResponseRedirect(reverse("entry", kwargs={'entry': value}))
     else:
         Entries = []
         for entry in util.list_entries():
